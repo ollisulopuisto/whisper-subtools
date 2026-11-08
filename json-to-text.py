@@ -1,5 +1,6 @@
 import json
 import sys
+from pathlib import Path
 
 def transcript_to_text(json_file, output_file):
     """Parses a JSON transcript file and outputs timestamps and text to a markdown file.
@@ -9,7 +10,14 @@ def transcript_to_text(json_file, output_file):
         output_file (str): Path to the output markdown file.
     """
 
-    with open(json_file, 'r', encoding='utf-8') as f:
+    source = Path(json_file)
+    destination = Path(output_file)
+    if source.resolve() == destination.resolve() or (
+        destination.exists() and source.samefile(destination)
+    ):
+        raise ValueError("Output must be different from the input transcript")
+
+    with source.open('r', encoding='utf-8') as f:
         data = json.load(f)
 
     with open(output_file, 'w', encoding='utf-8') as outfile:
@@ -25,6 +33,10 @@ if __name__ == "__main__":
         sys.exit(1)
 
     input_file = sys.argv[1]
-    output_file = input_file.replace(".json", ".md")
+    output_file = Path(input_file).with_suffix(".md")
 
-    transcript_to_text(input_file, output_file)
+    try:
+        transcript_to_text(input_file, output_file)
+    except ValueError as error:
+        print(f"Error: {error}", file=sys.stderr)
+        sys.exit(1)
