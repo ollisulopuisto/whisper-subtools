@@ -29,7 +29,7 @@ def transcript_to_text(json_file, output_file):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python parser.py <input_json_file>")
+        print("Usage: python json-to-text.py <input_json_file>")
         sys.exit(1)
 
     input_file = sys.argv[1]
